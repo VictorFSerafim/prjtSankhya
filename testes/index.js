@@ -1,22 +1,39 @@
-const puppeteer =require('puppeteer');
+const puppeteer = require('puppeteer');
+const fs=require('fs');
 
-(async ()=>{
-    // 
-    const browser =await puppeteer.launch({headless:false});
-    const page = await browser.newPage();
-    await page.goto('http://localhost:3000/');
-    // await page.goto('https://instagram.com/rocketseat_oficial');
+// e, devtools: true
+(async () => {
+  const browser = await puppeteer.launch({ headless: false });
+  const page = await browser.newPage();
+  await page.goto('http://localhost:3000/');
 
-    // document.querySelector('sk-search').shadowRoot.querySelectorAll('.resulLine')
+  await page.waitFor(2000);
+  
+  await page.type('[name=campoBusca]','água');
 
-    await page.evaluate(()=>{
-        const nodeList=document.querySelector('sk-search').shadowRoot.querySelectorAll('.resulLine');
-        const textArray=[...nodeList];
+  const allResultsSelector='.my-input-textbox';
 
-        const list=textArray.map((name)=>({
-            name
-        }));
+  await page.waitForSelector(allResultsSelector);
 
-        console.log(nodeList);
-    })
+  await page.click('[name=botaoBusca]');
+  
+  const resultsSelector='.resulLine';
+
+  await page.waitForSelector(resultsSelector);
+
+ const links = await page.evaluate((resultsSelector) => {
+    const anchors = Array.from(document.querySelectorAll(resultsSelector));
+    return anchors.map((anchor) => {
+      const title = anchor.textContent.split('|')[0].trim();
+      return `${title}`;
+    });
+  }, resultsSelector);
+
+  fs.writeFile('resultadoPesquisa.json',JSON.stringify(links,null,2),err=>{
+      if(err) throw new Error('wrong')
+  })
+
+//   await browser.close();
+
 })();
+

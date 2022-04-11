@@ -4,7 +4,7 @@ import expenses from '../../repositories/expenses';
 @Component({
   tag: 'sk-search',
   styleUrl: 'sk-search.scss',
-  shadow: true,
+  shadow: false,
 })
 export class SkSearch {
   @Prop({ mutable: true }) searchText: string;
@@ -17,8 +17,8 @@ export class SkSearch {
   }
 
   buscarRegistros(value) {
-    if (value.description === this.searchText)
-      return value;
+    if (String(value.description).toLocaleLowerCase() === this.searchText.toLocaleLowerCase())
+      return value.description;
   }
 
   searchFromAPI() {
@@ -36,13 +36,16 @@ export class SkSearch {
 
   render() {
     return (
-      <div class="main-search-div">
-        <input class="my-input-textbox" type="text" value={this.searchText} onInput={this.onUserInput.bind(this)}></input>
-        <button class="btn-react" onClick={this.searchFromAPI.bind(this)}>
-          Buscar
-        </button>
+      <div class="mainsearch">
+        <div class="mainsearch__teste">
+          <input class="my-input-textbox" type="text" name="campoBusca" value={this.searchText} onInput={this.onUserInput.bind(this)}></input>
+          <button class="btn-react" name='botaoBusca' onClick={this.searchFromAPI.bind(this)}>
+            Buscar
+          </button>
+        </div>
+
         <hr></hr>
-        <br></br> <br></br>
+        <br></br>
 
         <table id="api-table">
           {this.searchResult.map(r => (
